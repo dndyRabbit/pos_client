@@ -1,6 +1,7 @@
 
 import React from "react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb";
+import Link from "next/link";
 
 export default function BreadcumbPages({data}) {
   return (
@@ -9,9 +10,16 @@ export default function BreadcumbPages({data}) {
         {data?.map((val, index) => (
           <React.Fragment>
             {index !== 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem key={index}>
-              <BreadcrumbPage href={val.url}>{val.page}</BreadcrumbPage>
-            </BreadcrumbItem>
+            {val.isChild ? 
+              <BreadcrumbItem key={index}>
+                <BreadcrumbLink asChild>
+                  <Link href={val.url}>{val.page}</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>  : 
+              <BreadcrumbItem key={index}>
+                <BreadcrumbPage>{val.page}</BreadcrumbPage>
+              </BreadcrumbItem>
+            }
           </React.Fragment>
         ))}
       </BreadcrumbList>

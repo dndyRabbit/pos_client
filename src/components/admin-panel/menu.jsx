@@ -33,7 +33,7 @@ export function Menu({ isOpen }) {
 
       if(res.status === 200){
         clearStorage()
-        router.push('/')
+        router.push('/login')
         toast.success('Account logged out.')
       }
     } catch (err) {

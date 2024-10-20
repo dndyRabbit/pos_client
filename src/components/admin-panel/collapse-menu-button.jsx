@@ -58,7 +58,7 @@ export function CollapseMenuButton({
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center">
               <span className="mr-4">
-                <Rabbit size={18} />
+                <Cat size={18} />
               </span>
               <p
                 className={cn(
