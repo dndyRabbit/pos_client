@@ -13,7 +13,7 @@ export async function POST(req, res) {
       sameSite: "none",
       secure: true,
     });
-    cookies().set("X-fnb", response.data.data.fnb_id, {
+    cookies().set("X-companies", response.data.data.company_id, {
       httpOnly: true,
       sameSite: "none",
       secure: true,
@@ -24,18 +24,22 @@ export async function POST(req, res) {
       secure: true,
     });
 
-    let userData = response.data.data
-    delete userData.token
-    cookies().set("current_user", userData, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
+    // let userData = response.data.data
+    // delete userData.token
+    // cookies().set("current_user", userData, {
+    //   httpOnly: true,
+    //   sameSite: "none",
+    //   secure: true,
+    // });
 
-    return NextResponse.json(response?.data?.data, res);
+    return NextResponse.json(response?.data);
   } catch (error) {
-    const errorMessage = error.response?.data?.message;
-    return NextResponse.json({ message: errorMessage});
+    console.log(error)
+    const errorMessage = error.response?.data?.message || "Login failed. Please try again.";
+    return NextResponse.json(
+        { message: errorMessage },
+        { status: error.response?.status || 500 } // Use the error status or default to 500
+    );
   }
 }
 

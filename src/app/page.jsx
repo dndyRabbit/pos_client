@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { setCurrentUser, setMenus } from "@/utils/cookies";
+import { toast } from "sonner";
 
 export default function HomePage() {
   const router = useRouter()
@@ -43,8 +45,16 @@ export default function HomePage() {
 
       const res = await axios.post('/api/login', payload)
 
-      if(res.status === 200){
+      if(res?.status === 200){
+        const menus = res?.data?.data?.menu
+        const userData = res.data.data
+        delete userData.token
+        delete userData.menu
+
+        setMenus(menus)
+        setCurrentUser(userData)
         router.push('dashboard')
+        toast.success('Login Successfully.')
       }
 
       setLoading(false)

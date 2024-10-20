@@ -1,9 +1,10 @@
 
+
 import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   metadataBase: new URL(
@@ -43,6 +44,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
+        <Toaster expand={false} richColors position="top-center" />
       </body>
     </html>
   );

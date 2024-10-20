@@ -1,12 +1,21 @@
-export default async function handler(req, res) {
+import { clearStorage } from "@/utils/cookies";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+
+export async function POST(req, res) {
     try {
-        res.setHeader('Set-Cookie', [
-            `ACCESS_TOKEN=; Max-Age=0; Path=/; HttpOnly; Secure`,
-            `REFRESH_TOKEN=; Max-Age=0; Path=/; HttpOnly; Secure`,
-            `X-fnb=; Max-Age=0; Secure; Path=/`
-        ]);
-        return res.status(200).json({ message: 'OK' })
+        cookies().delete("access_token");
+        cookies().delete("X-companies");
+        cookies().delete("refresh_token");
+        cookies().delete("current_user");
+        
+       return NextResponse.json({message: "OK"});
     } catch (error) {
-        return res.status(401).json(error)
+        console.log(error)
+        const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
+        return NextResponse.json(
+            { message: errorMessage },
+            { status: error.response?.status || 500 } // Use the error status or default to 500
+        );
     }
 }

@@ -10,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import withAuthenticatedPage from "@/lib/withAuthenticatedPage";
 
 export default function UsersPage() {
   return (
@@ -37,3 +38,5 @@ export default function UsersPage() {
     </ContentLayout>
   );
 }
+
+// export const getServerSideProps = withAuthenticatedPage();

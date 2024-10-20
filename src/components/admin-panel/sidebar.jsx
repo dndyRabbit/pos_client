@@ -11,6 +11,7 @@ import Link from "next/link";
 export function Sidebar() {
   const sidebar = useStore(useSidebar, (x) => x);
   if (!sidebar) return null;
+
   const { isOpen, toggleOpen, getOpenState, setIsHover, settings } = sidebar;
   return (
     <aside

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronDown, Dot, LucideIcon } from "lucide-react";
+import { Angry, ArrowRightCircle, CableCar, Cat, ChevronDown, ChevronUp, Dot, LucideIcon, PawPrint, Rabbit, SquareArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,15 +29,15 @@ import {
 import { usePathname } from "next/navigation";
 
 export function CollapseMenuButton({
-  icon: Icon,
-  label,
+  // icon: Icon,
+  name,
   active,
-  submenus,
+  menu_child,
   isOpen
 }) {
   const pathname = usePathname();
-  const isSubmenuActive = submenus.some((submenu) =>
-    submenu.active === undefined ? submenu.href === pathname : submenu.active
+  const isSubmenuActive = menu_child.some((submenu) =>
+    submenu.active === undefined ? submenu.url === pathname : submenu.active
   );
   const [isCollapsed, setIsCollapsed] = useState(isSubmenuActive);
 
@@ -58,7 +58,7 @@ export function CollapseMenuButton({
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center">
               <span className="mr-4">
-                <Icon size={18} />
+                <Rabbit size={18} />
               </span>
               <p
                 className={cn(
@@ -68,7 +68,7 @@ export function CollapseMenuButton({
                     : "-translate-x-96 opacity-0"
                 )}
               >
-                {label}
+                {name}
               </p>
             </div>
             <div
@@ -88,20 +88,20 @@ export function CollapseMenuButton({
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-        {submenus.map(({ href, label, active }, index) => (
+        {menu_child.map(({ url, name, active }, index) => (
           <Button
             key={index}
             variant={
-              (active === undefined && pathname === href) || active
+              (active === undefined && pathname === url) || active
                 ? "secondary"
                 : "ghost"
             }
             className="w-full justify-start h-10 mb-1"
             asChild
           >
-            <Link href={href}>
+            <Link href={url}>
               <span className="mr-4 ml-2">
-                <Dot size={18} />
+                <PawPrint size={18} />
               </span>
               <p
                 className={cn(
@@ -111,7 +111,7 @@ export function CollapseMenuButton({
                     : "-translate-x-96 opacity-0"
                 )}
               >
-                {label}
+                {name}
               </p>
             </Link>
           </Button>
@@ -131,7 +131,7 @@ export function CollapseMenuButton({
                 <div className="w-full items-center flex justify-between">
                   <div className="flex items-center">
                     <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <Icon size={18} />
+                      <Cat size={18} />
                     </span>
                     <p
                       className={cn(
@@ -139,7 +139,7 @@ export function CollapseMenuButton({
                         isOpen === false ? "opacity-0" : "opacity-100"
                       )}
                     >
-                      {label}
+                      {name}
                     </p>
                   </div>
                 </div>
@@ -147,25 +147,25 @@ export function CollapseMenuButton({
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="right" align="start" alignOffset={2}>
-            {label}
+            {name}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent side="right" sideOffset={25} align="start">
         <DropdownMenuLabel className="max-w-[190px] truncate">
-          {label}
+          {name}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {submenus.map(({ href, label, active }, index) => (
+        {menu_child.map(({ url, name, active }, index) => (
           <DropdownMenuItem key={index} asChild>
             <Link
               className={`cursor-pointer ${
-                ((active === undefined && pathname === href) || active) &&
+                ((active === undefined && pathname === url) || active) &&
                 "bg-secondary"
               }`}
-              href={href}
+              href={url}
             >
-              <p className="max-w-[180px] truncate">{label}</p>
+              <p className="max-w-[180px] truncate">{name}</p>
             </Link>
           </DropdownMenuItem>
         ))}

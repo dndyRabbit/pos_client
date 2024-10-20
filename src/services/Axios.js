@@ -21,7 +21,7 @@ axiosInstance.interceptors.response.use(
         // Check if the error status is 401 (Unauthorized)
         if (statusCode === 401 && ['Invalid jwt token', 'Unauthorized access'].includes(messageErrors)) {
             localStorage.clear();
-            window.location.href = '/login';
+            window.location.href = '/';
 
             // Redirect to login page (this would need to be implemented)
             // Since interceptors can't perform redirects directly,

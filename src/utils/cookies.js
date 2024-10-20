@@ -57,11 +57,33 @@ export const getAccessToken = () => {
 export const getRefreshToken = () => {
     return storageItem?.getItem('refresh_token') ?? '';
 };
-export const setFnbEntity = (payload) => {
-  return storageItem?.setItem('fnb', payload);
-};
-export const getFnbEntity = () => {
-  return storageItem?.getItem('refresh_token') ?? '';
+
+export const setMenus = (payload) => {
+  try {
+    if (payload) {
+      storageItem?.setItem('menus', JSON.stringify(payload));
+    } else {
+      storageItem?.removeItem('menus');
+    }
+  } catch (error) {
+    console.log('>>>>: src/helpers/Utils.js : setMenus -> error', error);
+  }
 };
 
+export const getMenus = () => {
+  let menu = null;
+  try {
+    menu =
+      storageItem?.getItem('menus') != null
+        ? JSON.parse(storageItem?.getItem('menus'))
+        : null;
+  } catch (error) {
+    console.log('>>>>: src/helpers/Utils.js  : getMenus -> error', error);
+    menu = null;
+  }
+  return menu;
+};
 
+export const clearStorage = () => {
+  storageItem?.clear();
+};
