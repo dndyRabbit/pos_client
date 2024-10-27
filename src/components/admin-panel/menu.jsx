@@ -16,34 +16,15 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 import { clearStorage, getMenus } from "@/utils/cookies";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export function Menu({ isOpen }) {
-  
-  const router = useRouter()
   const pathname = usePathname();
   // const menuList = getMenuList(pathname);
   const menus = getMenus()
 
-  const onLogout = async () => {
-    try {
-      const res = await axios.post('/api/logout', null)
-
-      if(res.status === 200){
-        clearStorage()
-        router.push('/login')
-        toast.success('Account logged out.')
-      }
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
   return (
-    <ScrollArea className="[&>div>div[style]]:!block">
-      <nav className="mt-8 h-full w-full">
+    <ScrollArea className="[&>div>div[style]]:!block border overflow-hidden">
+      <nav className="mt-2 h-[90vh] py-2 w-full">
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
           <li className={cn("w-full")}>
             {menus?.map(
@@ -107,35 +88,6 @@ export function Menu({ isOpen }) {
                   </div>
                 )
             )}
-          </li>
-          <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={onLogout}
-                    variant="outline"
-                    className="w-full justify-center h-10 mt-5"
-                    type="button"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
-                    >
-                      Sign out
-                    </p>
-                  </Button>
-                </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
           </li>
         </ul>
       </nav>

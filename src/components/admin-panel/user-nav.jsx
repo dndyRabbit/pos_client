@@ -20,8 +20,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import axios from "axios";
+import { clearStorage } from "@/utils/cookies";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
+  const router = useRouter()
+  
+  const onLogout = async () => {
+    try {
+      const res = await axios.post('/api/logout', null)
+
+      if(res.status === 200){
+        clearStorage()
+        router.push('/login')
+        toast.success('Account logged out.')
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -68,7 +88,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => onLogout()}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

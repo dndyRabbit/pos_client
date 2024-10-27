@@ -7,6 +7,8 @@ export async function middleware(req) {
     const refresh_token = req.cookies.get('refresh_token'); // Assuming refresh token is stored in cookies
     const { pathname } = req.nextUrl;
 
+    let isValidToken = false
+    
     // If no access token and trying to access a protected route, try to refresh
     if (access_token && refresh_token) {
         try {
@@ -15,6 +17,7 @@ export async function middleware(req) {
 
             await axios.post(url, {refresh_token: refresh_token.value})
 
+            isValidToken = true
             return NextResponse.next(); // Continue with the request if everything is fine
         } catch (error) {
             console.error("Failed to refresh token:", error);
@@ -22,19 +25,14 @@ export async function middleware(req) {
         }
     }
 
+    // If access token exists but trying to access the login page, redirect to home
+    if (isValidToken && ['/login', '/'].includes(pathname)) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
     // If there's no refresh token or both tokens are invalid, redirect to login
     if ((!access_token || !refresh_token) && !['/login', '/'].includes(pathname)) {
         return NextResponse.redirect(new URL('/login', req.url));
-    }
-
-    // If access token exists but trying to access the login page, redirect to home
-    if (access_token && pathname === '/login') {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-
-    // If access token exists but trying to access the login page, redirect to home
-    if (access_token && refresh_token && ['/login', '/'].includes(pathname)) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
     return NextResponse.next(); // Continue with the request if everything is fine
@@ -42,5 +40,5 @@ export async function middleware(req) {
 
 // Match routes to apply the middleware
 export const config = {
-    matcher: ['/dashboard'], // Add your protected routes here
+    matcher: ['/dashboard', '/material/ingredients', '/login', '/'], // Add your protected routes here
 };

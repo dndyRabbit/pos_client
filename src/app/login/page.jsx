@@ -11,10 +11,11 @@ import * as yup from "yup";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { setCurrentUser, setMenus } from "@/utils/cookies";
 import { toast } from "sonner";
+import AxiosAPI from "@/services/Axios";
+import axios from "axios";
 
 export default function Login() {
   const router = useRouter()
@@ -50,7 +51,7 @@ export default function Login() {
         const userData = res.data.data
         delete userData.token
         delete userData.menu
-
+        
         setMenus(menus)
         setCurrentUser(userData)
         router.push('dashboard')

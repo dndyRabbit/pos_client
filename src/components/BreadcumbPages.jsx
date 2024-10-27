@@ -5,13 +5,13 @@ import Link from "next/link";
 
 export default function BreadcumbPages({data}) {
   return (
-    <Breadcrumb className="mb-6">
+    <Breadcrumb className="mb-2">
       <BreadcrumbList>
         {data?.map((val, index) => (
-          <React.Fragment>
+          <React.Fragment key={index}>
             {index !== 0 && <BreadcrumbSeparator />}
             {val.isChild ? 
-              <BreadcrumbItem key={index}>
+              <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link href={val.url}>{val.page}</Link>
                 </BreadcrumbLink>

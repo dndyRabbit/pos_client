@@ -9,7 +9,6 @@ const config = {
   prefix: "",
   theme: {
     container: {
-      center: true,
       padding: "1rem",
       screens: {
         "2xl": "1550px"
@@ -57,6 +56,10 @@ const config = {
         sm: "calc(var(--radius) - 4px)"
       },
       keyframes: {
+        "wiggle": {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" }
@@ -75,6 +78,7 @@ const config = {
         }
       },
       animation: {
+        "wiggle": 'wiggle 0.2s ease-in-out infinite',
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "collapsible-down": "collapsible-down 0.2s ease-out",

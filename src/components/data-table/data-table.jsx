@@ -29,7 +29,7 @@ export function DataTable({
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
-            {table?.getHeaderGroups().map((headerGroup) => (
+            {table?.result?.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (

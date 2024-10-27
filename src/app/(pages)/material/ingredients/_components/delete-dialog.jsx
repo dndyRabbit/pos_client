@@ -27,33 +27,32 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Icons } from "@/components/icons"
+import { deleteIngredient } from "@/actions/masters"
 
-// import { deleteTasks } from "../_lib/actions"
-
-export function DeleteTasksDialog({
-  tasks,
+export function DeleteDialog({
+  datas,
   showTrigger = true,
-  onSuccess,
+  onSuccess = () => {},
+  fetchData = () => {},
   ...props
 }) {
-  const [isDeletePending, startDeleteTransition] = React.useTransition()
   const isDesktop = useMediaQuery("(min-width: 640px)")
 
-  function onDelete() {
-    startDeleteTransition(async () => {
-      // const { error } = await deleteTasks({
-      //   ids: tasks.map((task) => task.id),
-      // })
-
-      // if (error) {
-      //   toast.error(error)
-      //   return
-      // }
-
-      props.onOpenChange(false)
-      toast.success("Tasks deleted")
-      onSuccess?.()
-    })
+  async function onDelete() {
+    if(datas?.length > 0){
+      await Promise.all(
+        datas.map(async val => {
+          await deleteIngredient({
+            id: val.id,
+          })
+        })
+      )
+    }
+   
+    props?.onOpenChange(false)
+    await fetchData()
+    toast.success("Ingredients deleted")
+    onSuccess?.()
   }
 
   if (isDesktop) {
@@ -63,7 +62,7 @@ export function DeleteTasksDialog({
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
               <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-              Delete ({tasks.length})
+              Delete ({datas.length})
             </Button>
           </DialogTrigger>
         ) : null}
@@ -72,8 +71,8 @@ export function DeleteTasksDialog({
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
               This action cannot be undone. This will permanently delete your{" "}
-              <span className="font-medium">{tasks.length}</span>
-              {tasks.length === 1 ? " task" : " tasks"} from our servers.
+              <span className="font-medium">{datas.length}</span>
+              {datas.length === 1 ? " Ingredient" : " Ingredients"} from the dabatase.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
@@ -84,14 +83,14 @@ export function DeleteTasksDialog({
               aria-label="Delete selected rows"
               variant="destructive"
               onClick={onDelete}
-              disabled={isDeletePending}
+              // disabled={isDeletePending}
             >
-              {isDeletePending && (
+              {/* {isDeletePending && (
                 <Icons.spinner
                   className="mr-2 size-4 animate-spin"
                   aria-hidden="true"
                 />
-              )}
+              )} */}
               Delete
             </Button>
           </DialogFooter>
@@ -106,7 +105,7 @@ export function DeleteTasksDialog({
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-            Delete ({tasks.length})
+            Delete ({datas.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -115,8 +114,8 @@ export function DeleteTasksDialog({
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>
             This action cannot be undone. This will permanently delete your{" "}
-            <span className="font-medium">{tasks.length}</span>
-            {tasks.length === 1 ? " task" : " tasks"} from our servers.
+            <span className="font-medium">{datas.length}</span>
+            {datas.length === 1 ? " ingredient" : " ingredients"} from the database.
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
@@ -127,14 +126,13 @@ export function DeleteTasksDialog({
             aria-label="Delete selected rows"
             variant="destructive"
             onClick={onDelete}
-            disabled={isDeletePending}
           >
-            {isDeletePending && (
+            {/* {isDeletePending && (
               <Icons.spinner
                 className="mr-2 size-4 animate-spin"
                 aria-hidden="true"
               />
-            )}
+            )} */}
             Delete
           </Button>
         </DrawerFooter>

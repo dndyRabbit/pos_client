@@ -74,3 +74,9 @@
       @apply bg-background text-foreground;
     }
   }
+
+  @layer utilities {
+    .popover-content-width-full {
+    @apply w-[var(--radix-popover-trigger-width)];
+    }
+  }

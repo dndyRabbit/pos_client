@@ -3,21 +3,27 @@ import {
   ChevronRightIcon,
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
-} from "@radix-ui/react-icons"
+} from "@radix-ui/react-icons";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 export function DataTablePagination({
   table,
+  pagination, // the pagination response from the server
+  fetchData, // callback to load data on page change
   pageSizeOptions = [10, 20, 30, 40, 50],
 }) {
+  // Calculate `pageIndex` and `totalPages` from the server pagination response
+  const pageIndex = pagination.page - 1;
+  const totalPages = pagination.totalPage;
+
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       <div className="flex-1 whitespace-nowrap text-sm text-muted-foreground">
@@ -30,7 +36,8 @@ export function DataTablePagination({
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value))
+              table.setPageSize(Number(value));
+              fetchData(pageIndex, Number(value));
             }}
           >
             <SelectTrigger className="h-8 w-[4.5rem]">
@@ -46,16 +53,15 @@ export function DataTablePagination({
           </Select>
         </div>
         <div className="flex items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          Page {pageIndex + 1} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
           <Button
             aria-label="Go to first page"
             variant="outline"
             className="hidden size-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => fetchData(1, table.getState().pagination.pageSize)}
+            disabled={pageIndex === 0}
           >
             <DoubleArrowLeftIcon className="size-4" aria-hidden="true" />
           </Button>
@@ -64,8 +70,10 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() =>
+              fetchData(Math.max(1, pagination.page - 1))
+            }
+            disabled={pageIndex === 0}
           >
             <ChevronLeftIcon className="size-4" aria-hidden="true" />
           </Button>
@@ -74,8 +82,10 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              fetchData(Math.min(totalPages, pagination.page + 1), table.getState().pagination.pageSize)
+            }
+            disabled={pageIndex >= totalPages - 1}
           >
             <ChevronRightIcon className="size-4" aria-hidden="true" />
           </Button>
@@ -84,13 +94,13 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            onClick={() => fetchData(totalPages, table.getState().pagination.pageSize)}
+            disabled={pageIndex >= totalPages - 1}
           >
             <DoubleArrowRightIcon className="size-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+import AxiosAPI from "@/services/Axios";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from 'next/server';
@@ -5,8 +6,8 @@ import { NextResponse } from 'next/server';
 export async function POST(req, res) {
   let burl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
   try {
-    const payload = await req.json()
-    const response = await axios.post(`${burl}/auth/login`, payload)
+    const payload = await req.json() 
+    const response = await AxiosAPI.post(`auth/login`, payload)
 
     cookies().set("access_token", response.data.data.token.access_token, {
       httpOnly: true,
@@ -32,7 +33,7 @@ export async function POST(req, res) {
     //   secure: true,
     // });
 
-    return NextResponse.json(response?.data);
+    return NextResponse.json(response.data);
   } catch (error) {
     console.log(error)
     const errorMessage = error.response?.data?.message || "Login failed. Please try again.";

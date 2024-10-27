@@ -1,6 +1,7 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { UserNav } from "@/components/admin-panel/user-nav";
 import { SheetMenu } from "@/components/admin-panel/sheet-menu";
+import { Notification } from "@/components/notification-toggle";
 
 export function Navbar({ title }) {
   return (
@@ -11,6 +12,7 @@ export function Navbar({ title }) {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center justify-end">
+          <Notification />
           <ModeToggle />
           <UserNav />
         </div>
