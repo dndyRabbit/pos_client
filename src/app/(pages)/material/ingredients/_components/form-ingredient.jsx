@@ -38,7 +38,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
     name: "",
     quantity: 1,
     unit_id:null,
-    unit_price:null,
+    unit_price:0,
     supplier_id:null,
     use_stock_alert:false,
     min_stock:0,
@@ -88,14 +88,14 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
   React.useEffect(() => {
     form.reset({
       name: data?.name || "",
-      quantity: data?.quantity || null,
+      quantity: data?.quantity || 0,
       unit_id: data?.unit_id || null,
-      unit_price: data?.unit_price || null,
+      unit_price: data?.unit_price || 0,
       supplier_id: data?.supplier_id || null,
-      use_stock_alert:false,
-      min_stock: data?.min_stock || null,
-      max_stock: data?.max_stock || null,
-      stock_alert:  data?.stock_alert || null
+      use_stock_alert: data?.stock_alert ? true : false,
+      min_stock: data?.stock_alert?.min_stock || 0,
+      max_stock: data?.stock_alert?.max_stock || 0,
+      stock_alert:  data?.stock_alert?.stock_alert || 0
     })
   }, [data, form])
 
@@ -110,8 +110,6 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
       }
       let res
 
-      console.log(data?.id)
-
       if(data?.id){
         res = await updateIngredient(payload)
       } else {
@@ -125,9 +123,9 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
         return
       }
 
-      form.reset()
       savedAndCloseSheet()
       toast.success(`${data?.id ? 'Update' : 'Create'} Ingredient`)
+      form.reset()
     } catch (err) {
       console.log(err)
       toast.error(`Something went wrong`)
@@ -233,7 +231,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Min. Stock</FormLabel>
-                <NumericInput initialValue={field.value.toString()} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
+                <NumericInput initialValue={parseFloat(field.value)} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}
@@ -244,7 +242,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Max. Stock</FormLabel>
-                <NumericInput initialValue={field.value.toString()} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
+                <NumericInput initialValue={parseFloat(field.value)} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}
@@ -255,7 +253,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Stock Alert</FormLabel>
-                <NumericInput initialValue={field.value} placeholder="0" className="text-right" {...field} onCallback={field.onChange} />
+                <NumericInput initialValue={parseFloat(field.value)} placeholder="0" className="text-right" {...field} onCallback={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}

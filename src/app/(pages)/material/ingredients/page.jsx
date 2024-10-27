@@ -53,7 +53,6 @@ export default function Ingredients() {
 
   return (
     <ContentLayout title="Ingredients">
-      <BreadcumbPages data={data} />
       <Content>
         {fetching ? <>
           <Skeleton className="h-7 w-52" />
@@ -65,7 +64,8 @@ export default function Ingredients() {
             shrinkZero
           />
         </> : <>
-          <div className="flex items-center justify-end space-x-2">
+          <div className="flex items-center justify-between space-x-2">
+            <BreadcumbPages data={data} />
             <ExportImportButton />
           </div>
           {list.data && list.pagination ? 

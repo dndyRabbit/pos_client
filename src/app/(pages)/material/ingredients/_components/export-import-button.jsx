@@ -5,7 +5,7 @@ import React from 'react'
 
 export default function ExportImportButton() {
   return (
-    <React.Fragment>
+    <div className='flex space-x-2'>
        <Button
         aria-label="Toggle columns"
         variant="outline"
@@ -24,6 +24,6 @@ export default function ExportImportButton() {
         <Upload className="mr-2 size-4" />
         Import
       </Button>
-    </React.Fragment>
+    </div>
   )
 }

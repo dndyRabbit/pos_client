@@ -51,7 +51,7 @@ export default function DataTable({
         <FilterTable filter={filter} setFilter={setFilter} table={table} />
         <TableToolbarActions table={table} fetchData={fetchData} />
       </div>
-      <div className="rounded-md border overflow-auto max-h-[510px]" >
+      <div className="rounded-md border overflow-auto max-h-[560px]" >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
