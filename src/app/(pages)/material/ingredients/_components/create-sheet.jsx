@@ -13,11 +13,10 @@ import {
 import { PlusCircleIcon } from "lucide-react"
 import FormIngredient from "./form-ingredient"
 
-export default function CreateSheet({fetchData}) {
+export default function CreateSheet() {
   const [open, setOpen] = React.useState(false)
 
   const savedAndCloseSheet = async () => {
-    await fetchData()
     setOpen(!open)
   }
   const savedSheet = async () => {}

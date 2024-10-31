@@ -1,4 +1,3 @@
-"use client"
 import * as React from "react"
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
@@ -9,76 +8,40 @@ import { getListIngredients } from "@/actions/masters";
 import DataTable from "./_components/table";
 import { columns } from "./_components/columns";
 import ExportImportButton from "./_components/export-import-button";
+import { ingredientPages } from "@/app/data/breadcumb-pages";
+import removeUnvaluedParams from "@/helper/remove-unvalued-params";
 
-let data = [{url: '', page:'Material', isChild: true}, {url: '/material/ingredients', page:'Ingredients'}]
-
-export default function Ingredients() {
-  const [fetching, setFetching] = React.useState(true)
-  const [loading, setLoading] = React.useState(false)
-  const [list, setList] = React.useState({
-    data: [],
-    pagination: null
-  })
-  const [filter, setFilter] = React.useState({
-    search: ''
-  })
-
-  const fetchListIngredients = async (page = 1, limit = 10) => {
-    setLoading(true)
-    let params = { page, limit, ...filter}
-
-    for (const prop in params) {
-      if (params.hasOwnProperty(prop)) {
-        if ((params[prop] === '') || (params[prop] === null)) {
-          delete params[prop];
-        }
-      }
-    }
-
-    const res = await getListIngredients(params)
-    setList({ data: res.result, pagination: res.pagination})
-    setFetching(false)
-    setLoading(false)
-  }
-
-  React.useEffect(() => {
-    const debounces = setTimeout(() => {
-      fetchListIngredients();
-    }, 400);
-
-    return () => {
-      clearTimeout(debounces)
-    }
-  }, [filter.search])
+export default async function Ingredients({ searchParams: { page = 1, limit = 10, search } }) {
+  let params = { page, limit, search }
+  params = removeUnvaluedParams(params)
+  const {result, pagination} = await getListIngredients(params)
 
   return (
     <ContentLayout title="Ingredients">
       <Content>
-        {fetching ? <>
-          <Skeleton className="h-7 w-52" />
-          <DataTableSkeleton
-            columnCount={5}
-            searchableColumnCount={1}
-            filterableColumnCount={2}
-            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-            shrinkZero
-          />
-        </> : <>
+        <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <div className="flex items-center justify-between space-x-2">
-            <BreadcumbPages data={data} />
+            <BreadcumbPages data={ingredientPages} />
             <ExportImportButton />
           </div>
-          {list.data && list.pagination ? 
-            <DataTable 
-              filter={filter} 
-              setFilter={setFilter} 
-              data={list.data} 
-              columns={columns} 
-              pagination={list.pagination} 
-              fetchData={fetchListIngredients}  
-            /> : <></>
+        </React.Suspense>
+        <React.Suspense
+          fallback={
+            <DataTableSkeleton
+              columnCount={5}
+              searchableColumnCount={1}
+              filterableColumnCount={2}
+              cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+              shrinkZero
+            />
           }
-        </>}
+        >
+          <DataTable 
+            data={result} 
+            columns={columns} 
+            pagination={pagination} 
+          /> 
+        </React.Suspense>
       </Content>
     </ContentLayout>
   );

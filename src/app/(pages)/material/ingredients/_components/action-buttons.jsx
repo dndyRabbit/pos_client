@@ -7,7 +7,7 @@ import { AlertCircle, Pen } from "lucide-react";
 import * as React from "react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
-const ActionButtons = ({ data, fetchData }) => {
+const ActionButtons = ({ data }) => {
   const [showUpdateSheet, setShowUpdateSheet] = React.useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
 
@@ -17,14 +17,12 @@ const ActionButtons = ({ data, fetchData }) => {
       data={data}
       onOpenChange={setShowUpdateSheet}
       open={showUpdateSheet}
-      fetchData={fetchData}
     />
     <DeleteDialog
       open={showDeleteDialog}
       onOpenChange={setShowDeleteDialog}
       datas={[data]}
       showTrigger={false}
-      fetchData={fetchData}
       onSuccess={() => {}}
     />
     <DropdownMenu>

@@ -13,14 +13,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSetParams } from "@/helper/set-params";
 
 export function DataTablePagination({
   table,
   pagination, // the pagination response from the server
-  fetchData, // callback to load data on page change
   pageSizeOptions = [10, 20, 30, 40, 50],
 }) {
-  // Calculate `pageIndex` and `totalPages` from the server pagination response
+  const setParams = useSetParams();
+
   const pageIndex = pagination.page - 1;
   const totalPages = pagination.totalPage;
 
@@ -37,7 +38,10 @@ export function DataTablePagination({
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-              fetchData(pageIndex, Number(value));
+              setParams({
+                page: pageIndex,
+                limit: Number(value),
+              });
             }}
           >
             <SelectTrigger className="h-8 w-[4.5rem]">
@@ -60,7 +64,12 @@ export function DataTablePagination({
             aria-label="Go to first page"
             variant="outline"
             className="hidden size-8 p-0 lg:flex"
-            onClick={() => fetchData(1, table.getState().pagination.pageSize)}
+            onClick={() => {
+              setParams({
+                page: 1,
+                limit: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={pageIndex === 0}
           >
             <DoubleArrowLeftIcon className="size-4" aria-hidden="true" />
@@ -70,9 +79,12 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() =>
-              fetchData(Math.max(1, pagination.page - 1))
-            }
+            onClick={() =>{
+              setParams({
+                page: Math.max(1, pagination.page - 1),
+                limit: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={pageIndex === 0}
           >
             <ChevronLeftIcon className="size-4" aria-hidden="true" />
@@ -82,9 +94,12 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() =>
-              fetchData(Math.min(totalPages, pagination.page + 1), table.getState().pagination.pageSize)
-            }
+            onClick={() => {
+              setParams({
+                page: Math.min(totalPages, pagination.page + 1),
+                limit: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={pageIndex >= totalPages - 1}
           >
             <ChevronRightIcon className="size-4" aria-hidden="true" />
@@ -94,7 +109,12 @@ export function DataTablePagination({
             variant="outline"
             size="icon"
             className="hidden size-8 lg:flex"
-            onClick={() => fetchData(totalPages, table.getState().pagination.pageSize)}
+            onClick={() => {
+              setParams({
+                page: totalPages,
+                limit: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={pageIndex >= totalPages - 1}
           >
             <DoubleArrowRightIcon className="size-4" aria-hidden="true" />

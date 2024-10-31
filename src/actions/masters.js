@@ -2,6 +2,7 @@
 
 import { auth } from "@/app/_lib/auth"
 import AxiosAPI from "@/services/Axios"
+import { revalidatePath } from "next/cache"
 
 export async function createIngredient(payload) {
   try {
@@ -10,7 +11,7 @@ export async function createIngredient(payload) {
     }
 
     const res = await AxiosAPI.post(`/material/ingredient`, payload.data, config)
-
+    revalidatePath(`/material/ingredients`)
     return { data:null, message:'OK!', status: res.status, error: null }
   } catch (err) {
     const error = err.response
@@ -25,8 +26,8 @@ export async function updateIngredient(payload) {
     }
 
     const res = await AxiosAPI.put(`/material/ingredient/${payload.id}`, payload.data, config)
-
-    return { data:null, message:'OK!', status: res.status, error: null }
+    revalidatePath(`/material/ingredients`)
+    return { data: null, message:'OK!', status: res.status, error: null }
   } catch (err) {
     const error = err.response
     console.log(error.data)
@@ -40,7 +41,7 @@ export async function deleteIngredient(payload) {
     }
 
     const res = await AxiosAPI.delete(`/material/ingredient/${payload.id}`, config)
-
+    revalidatePath(`/material/ingredients`)
     return { data: null, message:'OK!', status: res.status, error: null }
   } catch (err) {
     const error = err.response
@@ -62,7 +63,7 @@ export async function getListIngredients(params) {
         label: val.code
       }
     })
-
+    
     return {
       pagination: res.data.data.pagination,
       result

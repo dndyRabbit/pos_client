@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import NumericInput from "@/helper/numeric-formatter"
 import { Switch } from "@/components/ui/switch"
 import { useState } from 'react';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 export default function FormIngredient({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
   const [isPending, setIsPending] = useState(false)
@@ -265,12 +266,9 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
               Cancel
             </Button>
           </SheetClose>
-          <Button disabled={isPending}>
-            {isPending && (
-              <Icons.spinner
-                className="mr-2 size-4 animate-spin"
-                aria-hidden="true"
-              />
+          <Button disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && (
+              <LoadingButton />
             )}
             Save
           </Button>

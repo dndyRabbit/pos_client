@@ -12,10 +12,9 @@ import {
 } from "@/components/ui/sheet"
 import FormIngredient from "./form-ingredient"
 
-export default function UpdateSheet({ data, onOpenChange, open, fetchData }) {
+export default function UpdateSheet({ data, onOpenChange, open }) {
 
   const savedAndCloseSheet = async () => {
-    await fetchData()
     onOpenChange(!open)
   }
   const savedSheet = async () => {}

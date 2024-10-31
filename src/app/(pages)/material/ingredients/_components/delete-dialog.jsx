@@ -33,7 +33,6 @@ export function DeleteDialog({
   datas,
   showTrigger = true,
   onSuccess = () => {},
-  fetchData = () => {},
   ...props
 }) {
   const isDesktop = useMediaQuery("(min-width: 640px)")
@@ -50,7 +49,6 @@ export function DeleteDialog({
     }
    
     props?.onOpenChange(false)
-    await fetchData()
     toast.success("Ingredients deleted")
     onSuccess?.()
   }

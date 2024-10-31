@@ -18,14 +18,12 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 import FilterTable from "./filter-table";
 import { TableToolbarActions } from "./table-toolbar-actions";
 import ActionButtons from "./action-buttons";
+import EmptyData from "./empty-data";
 
 export default function DataTable({
   columns,
-  data,
+  data = [],
   pagination,
-  fetchData,
-  filter,
-  setFilter
 }) {
   const [columnVisibility, setColumnVisibility] = React.useState({})
 
@@ -48,65 +46,70 @@ export default function DataTable({
   return (
     <div>
       <div className="flex items-center justify-between py-4 space-x-2">
-        <FilterTable filter={filter} setFilter={setFilter} table={table} />
-        <TableToolbarActions table={table} fetchData={fetchData} />
+        <FilterTable table={table} />
+        <TableToolbarActions table={table} />
       </div>
-      <div className="rounded-md border overflow-auto max-h-[560px]" >
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="text-md">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
+      {data && data?.length > 0 && pagination ? 
+        <React.Fragment>
+          <div className="rounded-md border overflow-auto max-h-[560px]" >
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} className="text-md">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row, index) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
                           )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
 
-                      {cell.id === `${index}_actions` && <ActionButtons data={row.original} fetchData={fetchData} />}
+                          {cell.id === `${index}_actions` && <ActionButtons data={row.original} />}
+                        </TableCell>
+                      ))}
+                      
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
                     </TableCell>
-                  ))}
-                  
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex flex-col py-2">
-        <DataTablePagination table={table} pagination={pagination} fetchData={fetchData} />
-      </div>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex flex-col py-2">
+            <DataTablePagination table={table} pagination={pagination} />
+          </div>
+        </React.Fragment> :
+        <EmptyData label='ingredient' />
+      }
     </div>
   );
 }

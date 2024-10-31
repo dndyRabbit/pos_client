@@ -4,7 +4,7 @@ import {
   Settings,
   User,
   LucideEye,
-  LucideEyeClosed
+  LucideEyeClosed,
 } from "lucide-react";
 
 export const Icons = {

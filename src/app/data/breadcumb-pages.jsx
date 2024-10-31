@@ -1,0 +1,1 @@
+export const ingredientPages = [{url: '', page:'Material', isChild: true}, {url: '/material/ingredients', page:'Ingredients'}]
