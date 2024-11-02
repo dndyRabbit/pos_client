@@ -18,7 +18,7 @@ import {
   SheetClose,
   SheetFooter,
 } from "@/components/ui/sheet"
-import { createUom, getListUnit, updateUom } from "@/actions/masters"
+import { createUom, getListUnit, updateUom } from "@/actions/materials"
 import { useFetchOptions } from "@/hooks/use-options"
 import { Combobox } from "@/components/Combobox"
 import NumericInput from "@/helper/numeric-formatter"
@@ -26,8 +26,8 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export default function FormUom({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
-  // Fetching Options / Masters
-  const unit = useFetchOptions(getListUnit, {showall: true})
+  // Fetching Options / materials
+  const unit = useFetchOptions(getListUnit, {showAll: true})
 
   const initialValues = {
     from_unit_id:null,

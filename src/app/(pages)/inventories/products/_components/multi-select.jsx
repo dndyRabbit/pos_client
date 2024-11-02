@@ -1,4 +1,4 @@
-// components/Combobox.js
+// components/MultiSelectTable.js
 "use client"
 
 import * as React from "react"
@@ -18,20 +18,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
-export function Combobox({
+export default function MultiSelectIngredient({
   items = [],
-  placeholder = "Select item...",
-  onSelect,
-  selectedValue = "",
+  placeholder = "Select items...",
+  value = [], // Controlled value
+  onChange, // onChange handler from react-hook-form
   className = "",
 }) {
   const [open, setOpen] = React.useState(false)
 
-  const selectedItem = items.find((item) => item.value === selectedValue)
+  const isItemSelected = (item) => value.some((selected) => selected.value === item.value)
+
+  const handleSelect = (item) => {
+    let updatedValue
+    if (isItemSelected(item)) {
+      updatedValue = value.filter((selected) => selected.value !== item.value)
+    } else {
+      updatedValue = [...value, item]
+    }
+
+    updatedValue = updatedValue?.map(val => {
+      return {
+        ...val,
+        quantity_used: 0,
+        amount: 0,
+      }
+    })
+    onChange(updatedValue)
+  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen} >
+    <Popover open={open} onOpenChange={setOpen} className="h-full overflow-auto">
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -39,32 +58,30 @@ export function Combobox({
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
         >
-          {selectedItem ? selectedItem.label : placeholder}
+          <span className="truncate">{value.length > 0 ? value.map((item) => item.label).join(", ") : placeholder}</span>
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="popover-content-width-full p-0 border"
+        className="w-[300px] p-0" 
       >
-        <Command className="w-full">
+        <Command>
           <CommandInput placeholder={`${placeholder}`} className="h-9" />
           <CommandList>
             <CommandEmpty>No items found.</CommandEmpty>
-            <CommandGroup>
-              {items.map((item) => (
+            <CommandGroup heading="Ingredients">
+              {items.map((item, index) => (
                 <CommandItem
-                  key={item.value}
+                  key={index + 1}
                   value={item.value}
-                  onSelect={() => {
-                    onSelect(item.value)
-                    setOpen(false)
-                  }}
+                  onSelect={() => handleSelect(item)}
+                  className="cursor-pointer"
                 >
                   {item.label}
                   <CheckIcon
                     className={cn(
                       "ml-auto h-4 w-4",
-                      selectedValue === item.value ? "opacity-100" : "opacity-0"
+                      isItemSelected(item) ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

@@ -60,7 +60,7 @@ export async function getListIngredients(params) {
       return {
         ...val, 
         value: val.id,
-        label: val.code
+        label: val.name
       }
     })
     
@@ -212,4 +212,3 @@ export async function getListUom(params) {
     return { pagination: null, result: []}
   }
 }
-

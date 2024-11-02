@@ -4,24 +4,24 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { Skeleton } from "@/components/ui/skeleton"
 import BreadcumbPages from "@/components/BreadcumbPages";
 import Content from "@/components/Content";
-import { getListUom } from "@/actions/materials";
+import { getListProducts } from "@/actions/inventories";
 import DataTable from "./_components/table";
 import { columns } from "./_components/columns";
 import ExportImportButton from "./_components/export-import-button";
-import { uomPages } from "@/app/data/breadcumb-pages";
+import { productPages } from "@/app/data/breadcumb-pages";
 import removeUnvaluedParams from "@/helper/remove-unvalued-params";
 
-export default async function UOMs({ searchParams: { page = 1, limit = 10, search } }) {
+export default async function Products({ searchParams: { page = 1, limit = 10, search } }) {
   let params = { page, limit, search }
   params = removeUnvaluedParams(params)
-  const {result, pagination} = await getListUom(params)
+  const {result, pagination} = await getListProducts(params)
 
   return (
-    <ContentLayout title="UOMs">
+    <ContentLayout title="Products">
       <Content>
         <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <div className="flex items-center justify-between space-x-2">
-            <BreadcumbPages data={uomPages} />
+            <BreadcumbPages data={productPages} />
             <ExportImportButton />
           </div>
         </React.Suspense>

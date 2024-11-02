@@ -4,14 +4,14 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { Skeleton } from "@/components/ui/skeleton"
 import BreadcumbPages from "@/components/BreadcumbPages";
 import Content from "@/components/Content";
-import { getListUnit } from "@/actions/masters";
+import { getListUnit } from "@/actions/materials";
 import DataTable from "./_components/table";
 import { columns } from "./_components/columns";
 import ExportImportButton from "./_components/export-import-button";
 import { unitPages } from "@/app/data/breadcumb-pages";
 import removeUnvaluedParams from "@/helper/remove-unvalued-params";
 
-export default async function getListUnits({ searchParams: { page = 1, limit = 10, search } }) {
+export default async function Units({ searchParams: { page = 1, limit = 10, search } }) {
   let params = { page, limit, search }
   params = removeUnvaluedParams(params)
   const {result, pagination} = await getListUnit(params)

@@ -4,7 +4,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { Skeleton } from "@/components/ui/skeleton"
 import BreadcumbPages from "@/components/BreadcumbPages";
 import Content from "@/components/Content";
-import { getListIngredients } from "@/actions/masters";
+import { getListIngredients } from "@/actions/materials";
 import DataTable from "./_components/table";
 import { columns } from "./_components/columns";
 import ExportImportButton from "./_components/export-import-button";

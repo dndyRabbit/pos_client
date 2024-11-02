@@ -49,6 +49,10 @@ export const config = {
         '/material/ingredients',
         '/material/units',
         '/material/uoms',
+
+        '/inventories/products',
+        '/inventories/categories',
+        '/inventories/formula',
     ], // Define protected routes here
 };
 

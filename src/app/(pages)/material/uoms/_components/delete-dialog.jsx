@@ -26,7 +26,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { deleteUom } from "@/actions/masters"
+import { deleteUom } from "@/actions/materials"
 import { useSetParams } from "@/helper/set-params"
 
 export function DeleteDialog({

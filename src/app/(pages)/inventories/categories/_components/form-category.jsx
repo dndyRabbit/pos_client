@@ -19,19 +19,19 @@ import {
   SheetClose,
   SheetFooter,
 } from "@/components/ui/sheet"
-import { createUnit, getListUnit, updateUnit } from "@/actions/materials"
+import { createCategories, updateCategories } from "@/actions/inventories"
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from '@/components/ui/loading-button';
 
-export default function FormUnit({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
+export default function FormCategory({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
   const initialValues = {
     code: "",
     name: "",
     quantity: 1,
   }
   const validationSchema = Yup.object().shape({
-    code: Yup.string().required('Unit code is required.'),
-    name: Yup.string().required('Unit name is required.'),
+    code: Yup.string().required('Category ID is required.'),
+    name: Yup.string().required('Description is required.'),
   });
 
   const form = useForm({
@@ -58,10 +58,10 @@ export default function FormUnit({ data = null, savedAndCloseSheet = () => {}, s
       let res
 
       if(data?.id){
-        res = await updateUnit(payload)
+        res = await updateCategories(payload)
       } else {
         delete payload.id
-        res = await createUnit(payload)
+        res = await createCategories(payload)
       }
 
       if(res.status !== 200){
@@ -70,7 +70,7 @@ export default function FormUnit({ data = null, savedAndCloseSheet = () => {}, s
       }
 
       savedAndCloseSheet()
-      toast.success(`${data?.id ? 'Update' : 'Create'} Unit`)
+      toast.success(`${data?.id ? 'Update' : 'Create'} Category`)
       form.reset()
     } catch (err) {
       console.log(err)
@@ -89,9 +89,9 @@ export default function FormUnit({ data = null, savedAndCloseSheet = () => {}, s
           name="code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Unit ID</FormLabel>
+              <FormLabel>Categories ID</FormLabel>
               <Input
-                placeholder="e.g KG"
+                placeholder="e.g FOOD"
                 className="resize-none"
                 {...field}
               />
@@ -104,9 +104,9 @@ export default function FormUnit({ data = null, savedAndCloseSheet = () => {}, s
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Unit Description</FormLabel>
+              <FormLabel>Description</FormLabel>
               <Input
-                placeholder="e.g Kilogram"
+                placeholder="e.g Food"
                 className="resize-none"
                 {...field}
               />

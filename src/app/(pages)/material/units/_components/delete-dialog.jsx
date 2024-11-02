@@ -27,7 +27,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Icons } from "@/components/icons"
-import { deleteUnit } from "@/actions/masters"
+import { deleteUnit } from "@/actions/materials"
 import { useSetParams } from "@/helper/set-params"
 
 

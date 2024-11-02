@@ -19,25 +19,27 @@ import {
   SheetClose,
   SheetFooter,
 } from "@/components/ui/sheet"
-import { Icons } from "@/components/icons"
-import { createIngredient, getListUnit, updateIngredient } from "@/actions/materials"
+import { createProduct, getListCategories, updateProduct } from "@/actions/inventories"
 import { useFetchOptions } from "@/hooks/use-options"
 import { Combobox } from "@/components/Combobox"
 import { Input } from "@/components/ui/input"
 import NumericInput from "@/helper/numeric-formatter"
 import { Switch } from "@/components/ui/switch"
 import { LoadingButton } from '@/components/ui/loading-button';
+import { getListUnit } from '@/actions/materials';
 
-export default function FormIngredient({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
+export default function FormProduct({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
   // Fetching Options / materials
   const unit = useFetchOptions(getListUnit, {showAll: true})
+  const categories = useFetchOptions(getListCategories, {showAll: true})
 
   const initialValues = {
     name: "",
-    quantity: 1,
+    sku: "",
+    category_id:null,
     unit_id:null,
-    base_unit_id:null,
-    unit_price:0,
+    cost_price:0,
+    sale_price:0,
     supplier_id:null,
     use_stock_alert:false,
     min_stock:0,
@@ -45,9 +47,11 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
     stock_alert: 0
   }
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Ingredient name is required.'),
+    name: Yup.string().required('Product name is required.'),
+    quantity: Yup.number().required('Quantity is required.'),
+    category_id: Yup.number().required('Category is required.'),
     unit_id: Yup.number().required('Unit is required.'),
-    base_unit_id: Yup.number().required('Base unit is required.'),
+    sale_price: Yup.number().required('Sale price is required.'),
     use_stock_alert: Yup.boolean(),
     min_stock: Yup.number()
       .when('use_stock_alert', {
@@ -87,8 +91,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
   React.useEffect(() => {
     form.reset({
       name: data?.name || "",
-      quantity: data?.quantity || 1,
-      base_unit_id: data?.base_unit_id || null,
+      quantity: data?.quantity || 0,
       unit_id: data?.unit_id || null,
       unit_price: data?.unit_price || 0,
       supplier_id: data?.supplier_id || null,
@@ -110,10 +113,10 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
       let res
 
       if(data?.id){
-        res = await updateIngredient(payload)
+        res = await updateProduct(payload)
       } else {
         delete payload.id
-        res = await createIngredient(payload)
+        res = await createProduct(payload)
       }
 
       if(res.status !== 200){
@@ -122,7 +125,7 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
       }
 
       savedAndCloseSheet()
-      toast.success(`${data?.id ? 'Update' : 'Create'} Ingredient`)
+      toast.success(`${data?.id ? 'Update' : 'Create'} Product`)
       form.reset()
     } catch (err) {
       console.log(err)
@@ -141,9 +144,9 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ingredient Name</FormLabel>
+              <FormLabel>Product Name</FormLabel>
               <Input
-                placeholder="e.g Sugar"
+                placeholder="e.g Macha Latte"
                 className="resize-none"
                 {...field}
               />
@@ -153,25 +156,14 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
         />
         <FormField
           control={form.control}
-          name="quantity"
+          name="SKU"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Quantity</FormLabel>
-              <NumericInput initialValue={field.value} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="base_unit_id"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Base Unit</FormLabel>
-              <Combobox
-                items={unit.options}
-                selectedValue={field.value}
-                onSelect={field.onChange}
+              <FormLabel>SKU</FormLabel>
+              <Input
+                placeholder="e.g XXXX-XXX-XX-X"
+                className="resize-none"
+                {...field}
               />
               <FormMessage />
             </FormItem>
@@ -191,13 +183,39 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
               <FormMessage />
             </FormItem>
           )}
-        />
-         <FormField
+        /> 
+        <FormField
           control={form.control}
-          name="unit_price"
+          name="category_id"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Category</FormLabel>
+              <Combobox
+                items={categories.options}
+                selectedValue={field.value}
+                onSelect={field.onChange}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="cost_price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Unit Price</FormLabel>
+              <FormLabel>Cost Price</FormLabel>
+              <NumericInput initialValue={parseFloat(field.value)} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="sale_price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sale Price</FormLabel>
               <NumericInput initialValue={parseFloat(field.value)} placeholder="0" className="text-right"  {...field} onCallback={field.onChange} />
               <FormMessage />
             </FormItem>

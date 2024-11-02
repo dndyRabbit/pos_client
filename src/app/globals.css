@@ -77,6 +77,7 @@
 
   @layer utilities {
     .popover-content-width-full {
-    @apply w-[var(--radix-popover-trigger-width)];
+      @apply w-[var(--radix-popover-trigger-width)];
+      @apply max-h-[var(--radix-popover-trigger-height)];
     }
   }
