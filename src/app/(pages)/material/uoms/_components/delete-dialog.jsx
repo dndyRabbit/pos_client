@@ -26,7 +26,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { deleteIngredient } from "@/actions/masters"
+import { deleteUom } from "@/actions/masters"
 import { useSetParams } from "@/helper/set-params"
 
 export function DeleteDialog({
@@ -42,14 +42,14 @@ export function DeleteDialog({
     if(datas?.length > 0){
       await Promise.all(
         datas.map(async val => {
-          await deleteIngredient({
+          await deleteUom({
             id: val.id,
           })
         })
       )
     }
    
-    toast.success("Ingredients deleted")
+    toast.success("Uoms deleted")
     onSuccess?.()
     setParams({
       page: 1,
@@ -74,7 +74,7 @@ export function DeleteDialog({
             <DialogDescription>
               This action cannot be undone. This will permanently delete your{" "}
               <span className="font-medium">{datas.length}</span>
-              {datas.length === 1 ? " Ingredient" : " Ingredients"} from the dabatase.
+              {datas.length === 1 ? " Uom" : " Uoms"} from the dabatase.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
@@ -117,7 +117,7 @@ export function DeleteDialog({
           <DrawerDescription>
             This action cannot be undone. This will permanently delete your{" "}
             <span className="font-medium">{datas.length}</span>
-            {datas.length === 1 ? " ingredient" : " ingredients"} from the database.
+            {datas.length === 1 ? " Uom" : " Uoms"} from the database.
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">

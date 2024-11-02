@@ -108,7 +108,7 @@ export default function DataTable({
             <DataTablePagination table={table} pagination={pagination} />
           </div>
         </React.Fragment> :
-        <EmptyData label='ingredient' />
+        <EmptyData label='unit' />
       }
     </div>
   );

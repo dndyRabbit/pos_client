@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { setCurrentUser, setMenus } from "@/utils/cookies";
 import { toast } from "sonner";
-import AxiosAPI from "@/services/Axios";
 import axios from "axios";
 
 export default function Login() {

@@ -26,12 +26,9 @@ import { Combobox } from "@/components/Combobox"
 import { Input } from "@/components/ui/input"
 import NumericInput from "@/helper/numeric-formatter"
 import { Switch } from "@/components/ui/switch"
-import { useState } from 'react';
 import { LoadingButton } from '@/components/ui/loading-button';
 
 export default function FormIngredient({ data = null, savedAndCloseSheet = () => {}, savedSheet = () => {}, closeSheet = () => {} }) {
-  const [isPending, setIsPending] = useState(false)
-
   // Fetching Options / Masters
   const unit = useFetchOptions(getListUnit, {showall: true})
 
@@ -102,7 +99,6 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
 
   async function onSubmit(values) {
     try {
-      // setIsPending(true)
       let payload = {
         data:{
           ...values
@@ -120,7 +116,6 @@ export default function FormIngredient({ data = null, savedAndCloseSheet = () =>
 
       if(res.status !== 200){
         toast.error(`${res.error}`)
-        // setIsPending(false)
         return
       }
 

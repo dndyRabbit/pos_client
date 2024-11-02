@@ -12,7 +12,8 @@ export function useSetParams() {
 
     // Add new parameters or update existing ones
     Object.entries(newParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      console.log(value)
+      if (value !== undefined && value !== null && value !== '') {
         params.set(key, value);
       } else {
         params.delete(key); // remove param if value is null or undefined

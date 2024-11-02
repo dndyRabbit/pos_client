@@ -1,44 +1,55 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { setCurrentUser, setMenus } from './utils/cookies';
 
 export async function middleware(req) {
-    const access_token = req.cookies.get('access_token');
-    const refresh_token = req.cookies.get('refresh_token'); // Assuming refresh token is stored in cookies
+    const accessToken = req.cookies.get('access_token')?.value;
+    const refreshToken = req.cookies.get('refresh_token')?.value;
     const { pathname } = req.nextUrl;
 
-    let isValidToken = false
-    
-    // If no access token and trying to access a protected route, try to refresh
-    if (access_token && refresh_token) {
+    // If user has both tokens and is on the login or home page, redirect to /dashboard
+    if (accessToken && refreshToken && ['/login', '/'].includes(pathname)) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
+    // If missing either token and trying to access a protected route, redirect to login
+    if ((!accessToken || !refreshToken) && !['/login', '/'].includes(pathname)) {
+        return NextResponse.redirect(new URL('/login', req.url));
+    }
+
+    // Refresh token if the access token is missing but the refresh token is present
+    if (!accessToken && refreshToken) {
         try {
-            const url = req.nextUrl.clone()
-            url.pathname = '/api/refresh-token'
+            const refreshResponse = await axios.post(`${req.nextUrl.origin}/api/refresh-token`, {
+                refresh_token: refreshToken,
+            });
 
-            await axios.post(url, {refresh_token: refresh_token.value})
+            const { newAccessToken } = refreshResponse.data;
 
-            isValidToken = true
-            return NextResponse.next(); // Continue with the request if everything is fine
+            // If token refresh succeeds, set the new token and continue
+            const response = NextResponse.next();
+            response.cookies.set('access_token', newAccessToken, { httpOnly: true, secure: true });
+            return response;
+
         } catch (error) {
             console.error("Failed to refresh token:", error);
             return NextResponse.redirect(new URL('/login', req.url));
         }
     }
 
-    // If access token exists but trying to access the login page, redirect to home
-    if (isValidToken && ['/login', '/'].includes(pathname)) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-
-    // If there's no refresh token or both tokens are invalid, redirect to login
-    if ((!access_token || !refresh_token) && !['/login', '/'].includes(pathname)) {
-        return NextResponse.redirect(new URL('/login', req.url));
-    }
-
-    return NextResponse.next(); // Continue with the request if everything is fine
+    return NextResponse.next(); // Continue with the request
 }
 
 // Match routes to apply the middleware
 export const config = {
-    matcher: ['/dashboard', '/material/ingredients', '/login', '/'], // Add your protected routes here
+    matcher: [
+        '/dashboard', 
+        '/login', 
+        '/',
+
+        '/material/ingredients',
+        '/material/units',
+        '/material/uoms',
+    ], // Define protected routes here
 };
+
+
