@@ -33,19 +33,26 @@ export default function MultiSelectIngredient({
 
   const handleSelect = (item) => {
     let updatedValue
+
     if (isItemSelected(item)) {
+      // Remove the item if it's already selected
       updatedValue = value.filter((selected) => selected.value !== item.value)
     } else {
-      updatedValue = [...value, item]
+      // Add the new item, and modify only the new selection
+      updatedValue = [
+        ...value,
+        {
+          ...item,
+          unit_price: item.base_unit_id === item.unit_id ? item.unit_price : 0,
+          quantity_used: 0,
+          amount: item.base_unit_id === item.unit_id ? 0 : item.unit_price,
+        },
+      ]
     }
 
-    updatedValue = updatedValue?.map(val => {
-      return {
-        ...val,
-        quantity_used: 0,
-        amount: 0,
-      }
-    })
+    console.log(updatedValue, "")
+
+    // Call the onChange handler with the updated value
     onChange(updatedValue)
   }
 
@@ -58,21 +65,21 @@ export default function MultiSelectIngredient({
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
         >
-          <span className="truncate">{value.length > 0 ? value.map((item) => item.label).join(", ") : placeholder}</span>
+          <span className="truncate">
+            {value.length > 0 ? value.map((item) => item.label).join(", ") : placeholder}
+          </span>
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent 
-        className="w-[300px] p-0" 
-      >
+      <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput placeholder={`${placeholder}`} className="h-9" />
+          <CommandInput placeholder={placeholder} className="h-9" />
           <CommandList>
             <CommandEmpty>No items found.</CommandEmpty>
             <CommandGroup heading="Ingredients">
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <CommandItem
-                  key={index + 1}
+                  key={item.value} // Use unique `value` as key
                   value={item.value}
                   onSelect={() => handleSelect(item)}
                   className="cursor-pointer"

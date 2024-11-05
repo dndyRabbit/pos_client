@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import React, { forwardRef, useReducer } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 
 const numericFormatter = new Intl.NumberFormat("id-ID", {
   useGrouping: true,
@@ -10,25 +10,29 @@ const numericFormatter = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 0,
 });
 
-const CurrencyInput =({
+const CurrencyInput = ({
   className,
   initialValue = null,
   onCallback,
+  doSomething,
   ...props
 }, ref) => {
-  const [value, setValue] = useReducer(
-    (_, next) => {
-      const digits = next.replace(/\D/g, "");
-      return numericFormatter.format(Number(digits));
-    },
-    numericFormatter.format(initialValue)
+  const [value, setValue] = useState(
+    numericFormatter.format(parseFloat(initialValue || 0))
   );
 
-  const handleChange = (formattedValue) => {
-    const digits = formattedValue.replace(/\D/g, "");
-    const realValue = Number(digits);
-    if (onCallback) onCallback(realValue);
+  const handleChange = (inputValue) => {
+    const digits = inputValue.replace(/\D/g, "");
+    const realValue = parseFloat(digits || 0);
+
+    // Update the formatted value and trigger callback
+    setValue(numericFormatter.format(realValue));
+    if (onCallback) onCallback(realValue);  // Send unformatted value to callback
   };
+
+  useEffect(() => {
+    setValue(numericFormatter.format(parseFloat(initialValue || 0)));
+  }, [initialValue]);
 
   return (
     <Input
@@ -37,11 +41,11 @@ const CurrencyInput =({
       {...props}
       value={value}
       onChange={(ev) => {
-        setValue(ev.target.value);
         handleChange(ev.target.value);
+        if (doSomething) doSomething(ev.target.value); // Pass unformatted value
       }}
     />
   );
-}
+};
 
 export default forwardRef(CurrencyInput);

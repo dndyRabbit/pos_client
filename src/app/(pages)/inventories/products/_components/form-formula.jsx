@@ -22,7 +22,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { createProduct, getListCategories, getListProducts, updateProduct } from "@/actions/inventories"
+import { createOrUpdateFormula, createProduct, getListCategories, getListProducts, updateProduct } from "@/actions/inventories"
 import { useFetchOptions } from "@/hooks/use-options"
 import { Combobox } from "@/components/Combobox"
 import { Input } from "@/components/ui/input"
@@ -31,7 +31,7 @@ import { Switch } from "@/components/ui/switch"
 import { LoadingButton } from '@/components/ui/loading-button';
 import { getListIngredients, getListUnit } from '@/actions/materials';
 import { PlusCircle } from 'lucide-react';
-import MultiSelect from './multi-select';
+import MultiSelectIngredient from './multi-select-ingredient';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function FormFormula({ data = null, savedAndCloseSheet = () => {} }) {
@@ -44,19 +44,20 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
   const initialValues = {
     is_new_product: false,
     product_id: null,
-    selected_ingredients: [],
-
-    name: "",
-    sku: "",
-    category_id:null,
-    unit_id:null,
-    cost_price:0,
-    sale_price:0,
-    supplier_id:null,
-    use_stock_alert:false,
-    min_stock:0,
-    max_stock:0,
-    stock_alert: 0
+    formulas: [],
+    product:{
+      name: "",
+      sku: "",
+      category_id:null,
+      unit_id:null,
+      cost_price:0,
+      sale_price:0,
+      supplier_id:null,
+      use_stock_alert:false,
+      min_stock:0,
+      max_stock:0,
+      stock_alert: 0
+    }
   }
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Product name is required.'),
@@ -95,29 +96,32 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
   });
 
   const form = useForm({
-    resolver: yupResolver(validationSchema),
+    // resolver: yupResolver(validationSchema),
     defaultValues: initialValues
   })
 
-  const watchIsNewProduct = form.watch("is_new_product", false) 
-  const watchUseStockAlert = form.watch("use_stock_alert", false) 
-  const watchSelectedIngredients = form.watch("selected_ingredients", []) 
+  const isNewProduct = form.watch("is_new_product", false) 
+  const useStockAlert = form.watch("product.use_stock_alert", false) 
+  const selectedIngredients = form.watch("formulas", []) 
 
   React.useEffect(() => {
     form.reset({
-      product_id: data?.id || "",
-
-      name: "",
-      sku: "",
-      category_id:null,
-      unit_id:null,
-      cost_price:0,
-      sale_price:0,
-      supplier_id:null,
-      use_stock_alert:false,
-      min_stock:0,
-      max_stock:0,
-      stock_alert: 0
+      is_new_product: data.id ? false : true,
+      product_id: data.id,
+      formulas: data.formulas?.length > 0 ? data?.formulas : [],
+      product: {
+        name: "",
+        sku: "",
+        category_id:null,
+        unit_id:null,
+        cost_price:0,
+        sale_price:0,
+        supplier_id:null,
+        use_stock_alert:false,
+        min_stock:0,
+        max_stock:0,
+        stock_alert: 0
+      }
     })
   }, [data, form])
 
@@ -125,18 +129,21 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
     try {
       let payload = {
         data:{
-          ...values
+          ...values,
+          formulas: values.formulas?.map(val => {
+            return {
+              ingredient_id: val.id, 
+              quantity_used: val.quantity_used, 
+              unit_id: val.base_unit_id, 
+              cost_unit: val.unit_price
+            }
+          })
         },
-        id: data?.id
       }
-      let res
 
-      if(data?.id){
-        res = await updateProduct(payload)
-      } else {
-        delete payload.id
-        res = await createProduct(payload)
-      }
+      if(!values.is_new_product) delete payload.data.product
+
+      const res = await createOrUpdateFormula(payload)
 
       if(res.status !== 200){
         toast.error(`${res.error}`)
@@ -144,7 +151,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
       }
 
       savedAndCloseSheet()
-      toast.success(`${data?.id ? 'Update' : 'Create'} Product`)
+      toast.success(`Saved Formula`)
       form.reset()
     } catch (err) {
       console.log(err)
@@ -173,7 +180,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                   Cancel
                 </Button>
               </SheetClose>
-              <Button disabled={form.formState.isSubmitting}>
+              <Button disabled={form.formState.isSubmitting} type="submit">
                 {form.formState.isSubmitting && (
                   <LoadingButton />
                 )}
@@ -186,7 +193,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
           <div className='grid grid-cols-4 space-x-4'>
             {/* Form Products */}
             <div className='w-full space-y-4 items-center'>
-              {!watchIsNewProduct &&
+              {!isNewProduct &&
                 <FormField
                   control={form.control}
                   name="product_id"
@@ -223,10 +230,10 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 )}
               />
 
-              {watchIsNewProduct && <React.Fragment>
+              {isNewProduct && <React.Fragment>
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="product.name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Product Name</FormLabel>
@@ -241,7 +248,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="SKU"
+                  name="product.sku"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>SKU</FormLabel>
@@ -256,7 +263,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="unit_id"
+                  name="product.unit_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Unit</FormLabel>
@@ -271,7 +278,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 /> 
                 <FormField
                   control={form.control}
-                  name="category_id"
+                  name="product.category_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Category</FormLabel>
@@ -286,7 +293,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="cost_price"
+                  name="product.cost_price"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Cost Price</FormLabel>
@@ -297,7 +304,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="sale_price"
+                  name="product.sale_price"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Sale Price</FormLabel>
@@ -308,7 +315,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="supplier_id"
+                  name="product.supplier_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Supplier</FormLabel>
@@ -324,7 +331,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                 />
                 <FormField
                   control={form.control}
-                  name="use_stock_alert"
+                  name="product.use_stock_alert"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                       <div className="space-y-0.5">
@@ -340,10 +347,10 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                     </FormItem>
                   )}
                 />
-                {watchUseStockAlert && (<div className="grid grid-cols-3 space-x-2">
+                {useStockAlert && (<div className="grid grid-cols-3 space-x-2">
                   <FormField
                     control={form.control}
-                    name="min_stock"
+                    name="product.min_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>Min. Stock</FormLabel>
@@ -354,7 +361,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                   />
                   <FormField
                     control={form.control}
-                    name="max_stock"
+                    name="product.max_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>Max. Stock</FormLabel>
@@ -365,7 +372,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                   />
                   <FormField
                     control={form.control}
-                    name="stock_alert"
+                    name="product.stock_alert"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>Stock Alert</FormLabel>
@@ -382,11 +389,11 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
             <div className='w-full h-full space-y-4 col-span-3'>
               <FormField
                 control={form.control}
-                name="selected_ingredients"
+                name="formulas"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Select Ingredients</FormLabel>
-                    <MultiSelect
+                    <MultiSelectIngredient
                       items={ingredients.options}
                       value={field.value}
                       onChange={field.onChange}
@@ -407,20 +414,16 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                       <TableHead className="text-right w-[200px]">Amount</TableHead>
                     </TableRow>
                   </TableHeader>
-                  {watchSelectedIngredients?.length > 0 ? 
+                  {selectedIngredients?.length > 0 ? 
                     <TableBody>
-                      {watchSelectedIngredients.map((val, index) => {
-                        const watchQtyUsed = form.watch(`selected_ingredients[${index}].quantity_used`, 0) 
-                        const watchUnitPrice = form.watch(`selected_ingredients[${index}].unit_price`, 0) 
-                        const watchAmount = form.watch(`selected_ingredients[${index}].amount`, 0) 
-
+                      {selectedIngredients.map((val, index) => {
                         return (
                           <TableRow key={index}>
                             <TableCell className="font-medium truncate">{val.name}</TableCell>
                             <TableCell>
                               <FormField
                                 control={form.control}
-                                name={`selected_ingredients[${index}].quantity_used`}
+                                name={`formulas[${index}].quantity_used`}
                                 render={({ field }) => (
                                   <FormItem>
                                     <NumericInput 
@@ -428,7 +431,21 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                                       initialValue={parseFloat(field.value)} 
                                       placeholder="0" 
                                       className="text-right"  
-                                      onCallback={field.onChange} 
+                                      onCallback={(value) => {
+                                        field.onChange(value)
+                                      }} 
+
+                                      doSomething={(value) => {
+                                        const qtyUsed = form.watch(`formulas[${index}].quantity_used`, 0) 
+                                        const amount = form.watch(`formulas[${index}].amount`, 0) 
+
+                                        let costUnit = amount / qtyUsed
+                                        if(qtyUsed && amount){
+                                          form.setValue(`formulas[${index}].unit_price`, costUnit)
+                                        } else {
+                                          form.setValue(`formulas[${index}].unit_price`, 0)
+                                        }
+                                      }}
                                     />
                                     <FormMessage />
                                   </FormItem>
@@ -439,15 +456,26 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                             <TableCell>
                               <FormField
                                 control={form.control}
-                                name={`selected_ingredients[${index}].unit_price`}
+                                name={`formulas[${index}].unit_price`}
                                 render={({ field }) => (
                                   <FormItem>
                                     <NumericInput 
                                       {...field} 
-                                      initialValue={parseFloat(field.value)} 
+                                      initialValue={field.value} 
                                       placeholder="0" 
                                       className="text-right"  
                                       onCallback={field.onChange} 
+                                      doSomething={(value) => {
+                                        const unitPrice = form.watch(`formulas[${index}].unit_price`, 0) 
+                                        const amount = form.watch(`formulas[${index}].amount`, 0) 
+
+                                        let qtyUsed = amount / unitPrice
+                                        if(unitPrice && amount){
+                                          form.setValue(`formulas[${index}].quantity_used`, qtyUsed)
+                                        } else {
+                                          form.setValue(`formulas[${index}].quantity_used`, 0)
+                                        }
+                                      }}
                                     />
                                     <FormMessage />
                                   </FormItem>
@@ -457,7 +485,7 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                             <TableCell>
                               <FormField
                                 control={form.control}
-                                name={`selected_ingredients[${index}].amountamount`}
+                                name={`formulas[${index}].amount`}
                                 render={({ field }) => (
                                   <FormItem>
                                     <NumericInput 
@@ -482,10 +510,10 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
                     </TableBody>
                   }
 
-                  {watchSelectedIngredients?.length ? <TableFooter>
+                  {selectedIngredients?.length ? <TableFooter>
                     <TableRow>
-                      <TableCell colSpan={3}>Total Cost Price</TableCell>
-                      <TableCell className="text-right">0.00</TableCell>
+                      <TableCell colSpan={4}>Total Cost Price</TableCell>
+                      <TableCell className="text-right">{selectedIngredients?.reduce((acc, obj) => acc + obj.amount, 0)?.toLocaleString()}</TableCell>
                     </TableRow>
                   </TableFooter> : <></>}
                 </Table>
@@ -498,3 +526,5 @@ export default function FormFormula({ data = null, savedAndCloseSheet = () => {}
     </Form>
   )
 }
+
+

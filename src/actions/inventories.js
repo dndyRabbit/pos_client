@@ -142,3 +142,50 @@ export async function getListCategories(params) {
     return { pagination: null, result: []}
   }
 }
+
+export async function createOrUpdateFormula(payload) {
+  try {
+    const config = {
+      headers: await auth(),
+    }
+
+    const res = await AxiosAPI.post(`/inventories/formula`, payload.data, config)
+    revalidatePath(`/inventories/products`)
+    return { data:null, message:'OK!', status: res.status, error: null }
+  } catch (err) {
+    const error = err.response
+    console.log(error.data)
+    return { data:null, message:'ERR!', status: error?.status, error: error?.data?.message }
+  }
+}
+export async function deleteFormula(payload) {
+  try {
+    const config = {
+      headers: await auth(),
+    }
+
+    const res = await AxiosAPI.delete(`/inventories/product/${payload.id}`, config)
+    revalidatePath(`/inventories/products`)
+    return { data: null, message:'OK!', status: res.status, error: null }
+  } catch (err) {
+    const error = err.response
+    return { data:null, message:'ERR!', status: error?.status, error: error?.data?.message }
+  }
+}
+export async function getProductFormula(params) {
+  try {
+    const config = {
+      params: params.params,
+      headers: await auth()
+    }
+
+    const res = await AxiosAPI.get(`/inventories/formula/${params.product_id}`, config)
+
+    const result = res.data.data
+
+    return result || null
+  } catch (err) {
+    return null
+  }
+}
+
